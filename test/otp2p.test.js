@@ -1189,6 +1189,7 @@ describe('OTP2P Tests', function () {
 
     // trailing tombstone
     assert.equal(otp2p.modelIndexToViewIndex(0, ['a', 1]), 0);
+
   });
 
   it('does call observable on remote insert', function (done) {
@@ -1220,5 +1221,55 @@ describe('OTP2P Tests', function () {
       done();
     });
     evOtp2p.remoteInsert(1, 'b');
+  });
+
+  it('does call observable on remote delete', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.view = 'a';
+    evOtp2p.typeModel = {
+      "charLength":1,
+      "totalLength":1,
+      "data": ['a']
+    };
+
+    evOtp2p.on('delete', (command) => {
+      assert.deepEqual(command, {
+        index: 0,
+        numChars: 1
+      });
+      done();
+    });
+    evOtp2p.remoteDelete(0);
+  });
+
+  it('does calculate effected chars with tombstones', function () {
+    assert.equal(
+      otp2p.modelEffectedToViewEffected(0, 2, ['ab']),
+      2
+    );
+    assert.equal(
+      otp2p.modelEffectedToViewEffected(3, 3, [1, 'a', 1, 'b', 1, 'c', 1]),
+      2
+    );
+
+  });
+
+  it('does call observable on remote delete with tombstones', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.view = 'abc';
+    evOtp2p.typeModel = {
+      "charLength":3,
+      "totalLength":7,
+      "data": [1, 'a', 1, 'b', 1, 'c', 1]
+    };
+
+    evOtp2p.on('delete', (command) => {
+      assert.deepEqual(command, {
+        index: 1,
+        numChars: 2
+      });
+      done();
+    });
+    evOtp2p.remoteDelete(3, 3);
   });
 });

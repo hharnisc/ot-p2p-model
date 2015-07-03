@@ -65,6 +65,18 @@ class OTP2P extends EventEmitter {
     return model.filter((item) => !that.isTombstone(item)).join('');
   }
 
+  modelEffectedToViewEffected(modelIndex, numEffected, model) {
+    var that = this;
+    var tombstonesBetween = model.reduce((p, c, i, a) => {
+      if (i > modelIndex && i < modelIndex + numEffected && that.isTombstone(c)) {
+        return p + c;
+      } else {
+        return p;
+      }
+    }, 0);
+    return numEffected - tombstonesBetween;
+  }
+
   insert(index, chars) {
     if (index > this.view.length || index < 0) {
       throw new Error("Index is out of range")
@@ -107,7 +119,7 @@ class OTP2P extends EventEmitter {
       {'i': chars},
       modelIndex,
       type.serialize(this.typeModel)
-    )
+    );
 
     this.typeModel = type.apply(this.typeModel, op);
     this.view = this.modelItemsToView(type.serialize(this.typeModel));
@@ -118,15 +130,28 @@ class OTP2P extends EventEmitter {
     );
   }
 
-  remoteDelete(modelIndex, numchars=1) {
+  remoteDelete(modelIndex, numChars=1) {
     var op = this.generateRemoteOp(
-      {'d': numchars},
+      {'d': numChars},
       modelIndex,
       type.serialize(this.typeModel)
-    )
+    );
+
+    var viewIndex = this.modelIndexToViewIndex(
+      modelIndex,
+      type.serialize(this.typeModel)
+    );
+
+    var viewNumEffected = this.modelEffectedToViewEffected(
+      modelIndex, numChars, type.serialize(this.typeModel)
+    );
 
     this.typeModel = type.apply(this.typeModel, op);
     this.view = this.modelItemsToView(type.serialize(this.typeModel));
+    this.emit('delete', {
+      index: viewIndex,
+      numChars: viewNumEffected
+    });
   }
 
   generateRemoteOp(baseOp, modelIndex, model) {
