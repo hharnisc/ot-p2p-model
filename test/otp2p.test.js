@@ -671,4 +671,325 @@ describe('OTP2P Tests', function () {
     );
 
   });
+
+  it('does generate remote op', function () {
+    // delete first char
+    assert.deepEqual(otp2p.generateRemoteOp(
+      {'d': 1}, 0, ['a']),
+      [{'d': 1}]
+    );
+
+    // insert first char
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'a'}, 0, [] ),
+      [{'i': 'a'}]
+    );
+
+    // delete second char
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 1}, 1, ['ab'] ),
+      [1, {'d': 1}]
+    );
+
+    // insert second char
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'b'}, 1, ['a'] ),
+      [1, {'i': 'b'}]
+    );
+
+    // delete middle char
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 1}, 1, ['abc'] ),
+      [1, {'d': 1}, 1]
+    );
+
+    // insert middle char
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'b'}, 1, ['ac'] ),
+      [1, {'i': 'b'}, 1]
+    );
+
+    // delete with trailing tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 1}, 0, ['a', 1] ),
+      [{'d': 1}, 1]
+    );
+
+    // insert with trailing tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'a'}, 0, ['a', 1] ),
+      [{'i': 'a'}, 2]
+    );
+
+    // delete with preceding tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 1}, 1, [1, 'a'] ),
+      [1, {'d': 1}]
+    );
+
+    // insert with preceding tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'b'}, 2, [1, 'a'] ),
+      [2, {'i': 'b'}]
+    );
+    // delete with preceding and trailing tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 1}, 0, [1, 'a', 1] ),
+      [{'d': 1}, 2]
+    );
+    // insert with preceding and trailing tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'b'}, 1, [1, 'a', 1] ),
+      [1, {'i': 'b'}, 2]
+    );
+  });
+
+  it('does generate ops with changing multiple characters', function () {
+    // deletes first two characters
+    assert.deepEqual(otp2p.generateRemoteOp({'d': 2}, 0, ['ab'] ),[{'d': 2}]);
+
+    // inserts first two characters
+    assert.deepEqual(otp2p.generateRemoteOp({'i': 'aa'}, 0, []), [{'i': 'aa'}]);
+
+    // deletes first two characters with trailing characters
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 2}, 0, ['abc'] ),
+      [{'d': 2}, 1]
+    );
+
+    // inserts first two characters with trailing characters
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'ab'}, 0, ['c'] ),
+      [{'i': 'ab'}, 1]
+    );
+
+    // deletes last two characters with preceding characters
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 2}, 1, ['abc'] ),
+      [1, {'d': 2}]
+    );
+
+    // inserts last two characters with preceding characters
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'bc'}, 1, ['a'] ),
+      [1, {'i': 'bc'}]
+    );
+
+    // deletes first two characters with trailing tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 2}, 0, ['ab', 1] ),
+      [{'d': 2}, 1]
+    );
+
+    // inserts first two characters with trailing tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'ab'}, 0, [1] ),
+      [{'i': 'ab'}, 1]
+    );
+
+    // deletes last two characters with preceding tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 2}, 1, [1, 'bc'] ),
+      [1, {'d': 2}]
+    );
+
+    // inserts last two characters with preceding tombstone
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'bc'}, 1, [1, 'a'] ),
+      [1, {'i': 'bc'}, 1]
+    );
+
+    // deletes middle two characters
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 2}, 1, ['abcd'] ),
+      [1, {'d': 2}, 1]
+    );
+
+    // inserts middle two characters
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'bc'}, 1, ['ad'] ),
+      [1, {'i': 'bc'}, 1]
+    );
+
+    // deletes middle two characters surrounded by tombstones
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 2}, 1, [1, 'bc', 1] ),
+      [1, {'d': 2}, 1]
+    );
+
+    // inserts middle two characters surrounded by tombstones
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'bc'}, 2, [1, 'ad', 1] ),
+      [2, {'i': 'bc'}, 2]
+    );
+
+    // deletes with tombstones in between
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'d': 3}, 1, [1, 'a', 1, 'b', 1, 'c', 1] ),
+      [1, {'d': 3}, 3]
+    );
+
+    // inserts with tombstones in between
+    assert.deepEqual(
+      otp2p.generateRemoteOp({'i': 'bc'}, 3, [1, 'a', 1, 'd', 1] ),
+      [3, {'i': 'bc'}, 2]
+    );
+  });
+
+  it('does remote delete operations', function () {
+    // delete first char
+    otp2p.view = 'a';
+    otp2p.typeModel = {
+      "charLength":1,
+      "totalLength":1,
+      "data": ['a']
+    };
+
+    otp2p.remoteDelete(0);
+    assert.equal(otp2p.text(), '');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":0,
+        "totalLength":1,
+        "data": [1]
+      }
+    );
+
+    // delete last char
+    otp2p.view = 'ab';
+    otp2p.typeModel = {
+      "charLength":2,
+      "totalLength":2,
+      "data": ['ab']
+    };
+
+    otp2p.remoteDelete(1);
+    assert.equal(otp2p.text(), 'a');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":1,
+        "totalLength":2,
+        "data": ['a', 1]
+      }
+    );
+
+    // delete middle char
+    otp2p.view = 'abc';
+    otp2p.typeModel = {
+      "charLength":3,
+      "totalLength":3,
+      "data": ['abc']
+    };
+
+    otp2p.remoteDelete(1);
+    assert.equal(otp2p.text(), 'ac');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":2,
+        "totalLength":3,
+        "data": ['a', 1, 'c']
+      }
+    );
+
+    // delete first char with trailing tombstones
+    otp2p.view = 'a';
+    otp2p.typeModel = {
+      "charLength":1,
+      "totalLength":2,
+      "data": ['a', 1]
+    };
+
+    otp2p.remoteDelete(0);
+    assert.equal(otp2p.text(), '');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":0,
+        "totalLength":2,
+        "data": [2]
+      }
+    );
+
+    // delete last char with preceding tombstones
+    otp2p.view = 'b';
+    otp2p.typeModel = {
+      "charLength":1,
+      "totalLength":2,
+      "data": [1, 'b']
+    };
+
+    otp2p.remoteDelete(1);
+    assert.equal(otp2p.text(), '');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":0,
+        "totalLength":2,
+        "data": [2]
+      }
+    );
+  });
+
+  it('does remote delete multiple chars', function () {
+    // delete first 2 chars
+    otp2p.view = 'ab';
+    otp2p.typeModel = {
+      "charLength":2,
+      "totalLength":2,
+      "data": ['ab']
+    };
+
+    otp2p.remoteDelete(0, 2);
+    assert.equal(otp2p.text(), '');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":0,
+        "totalLength":2,
+        "data": [2]
+      }
+    );
+
+    // delete last 2 chars
+    otp2p.view = 'abc';
+    otp2p.typeModel = {
+      "charLength":3,
+      "totalLength":3,
+      "data": ['abc']
+    };
+
+    otp2p.remoteDelete(1, 2);
+    assert.equal(otp2p.text(), 'a');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":1,
+        "totalLength":3,
+        "data": ['a', 2]
+      }
+    );
+
+    // delete middle 2 chars
+
+    otp2p.view = 'abcd';
+    otp2p.typeModel = {
+      "charLength":4,
+      "totalLength":4,
+      "data": ['abcd']
+    };
+
+    otp2p.remoteDelete(1, 2);
+    assert.equal(otp2p.text(), 'ad');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":2,
+        "totalLength":4,
+        "data": ['a', 2, 'd']
+      }
+    );
+  });
 });

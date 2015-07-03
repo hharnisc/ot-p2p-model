@@ -32,8 +32,8 @@ class OTP2P {
       if (this.isTombstone(modelItem)) {
         curModelIndex += modelItem;
       } else {
-        curModelIndex += Math.min(viewIndex - curViewIndex, modelItem.length)
-        curViewIndex += modelItem.length
+        curModelIndex += Math.min(viewIndex - curViewIndex, modelItem.length);
+        curViewIndex += modelItem.length;
       }
       modelIndex += 1;
     }
@@ -84,6 +84,33 @@ class OTP2P {
     this.typeModel = type.apply(this.typeModel, op);
   }
 
+  remoteDelete(modelIndex, numchars=1) {
+    var op = this.generateRemoteOp(
+      {'d': numchars},
+      modelIndex,
+      type.serialize(this.typeModel)
+    )
+
+    this.typeModel = type.apply(this.typeModel, op);
+    this.view = this.modelItemsToView(type.serialize(this.typeModel))
+  }
+
+  generateRemoteOp(baseOp, modelIndex, model) {
+    var op = [];
+    if(modelIndex > 0) op.push(modelIndex);
+
+    op.push(baseOp);
+
+    var isDeleteOp = !!baseOp.d;
+    var modelLength = this.modelLength(model);
+    var charsEffected = isDeleteOp ? baseOp.d : baseOp.i.length;
+    var newModelLength = isDeleteOp ? modelLength : modelLength + charsEffected;
+    var trailingChars = newModelLength - modelIndex - charsEffected;
+    if (trailingChars > 0) op.push(trailingChars);
+
+    return op;
+  }
+
   generateOp(baseOp, index, view, model) {
     var op = [];
 
@@ -115,7 +142,6 @@ class OTP2P {
     if (trailingChars > 0) op.push(trailingChars);
     return op;
   }
-
 
   modelLength(model) {
     if (model.length === 0) return 0;

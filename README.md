@@ -61,3 +61,14 @@ otp2pModel.delete(index, numchars=1)
 ```
 **index** - (zero based) location of where to insert the string  
 **numchars** - the number of trailing characters to delete (default=1)
+
+### remoteDelete
+
+Delete command from a remote source (another peer)
+
+```javascript
+otp2pModel.deleteRemote(modelIndex, numchars=1)
+```
+
+**modelIndex** - (zero base) location of where to insert the string in the model
+**numchars** - the number of trailing characters to delete (default=1)
