@@ -46,11 +46,11 @@ otp2pModel.delete(1, 4); // delete 'ello'
 Insert command that occurs locally (from a text box for example)
 
 ```javascript
-otp2pModel.insert(string, index)
+otp2pModel.insert(index, string)
 ```
 
-**string** - a sequence of characters  
 **index** - (zero based) location of where to insert the string
+**string** - a sequence of characters  
 
 ### delete
 

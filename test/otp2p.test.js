@@ -281,7 +281,7 @@ describe('OTP2P Tests', function () {
 
   it('does insert in both view and model', function () {
     // insert first char
-    otp2p.insert('a', 0);
+    otp2p.insert(0, 'a');
     assert.equal(otp2p.text(), 'a');
     assert.deepEqual(
       otp2p.typeModel,
@@ -292,7 +292,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'a';
     otp2p.typeModel = {"charLength":1,"totalLength":1,"data":["a"]};
 
-    otp2p.insert('b', 1);
+    otp2p.insert(1, 'b');
 
     assert.equal(otp2p.text(), 'ab');
     assert.deepEqual(
@@ -304,7 +304,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'ac';
     otp2p.typeModel = {"charLength":2,"totalLength":2,"data":["ac"]};
 
-    otp2p.insert('b', 1);
+    otp2p.insert(1, 'b');
 
     assert.equal(otp2p.text(), 'abc');
     assert.deepEqual(
@@ -316,7 +316,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'a';
     otp2p.typeModel = {"charLength":1,"totalLength":2,"data":["a", 1]};
 
-    otp2p.insert('a', 0);
+    otp2p.insert(0, 'a');
 
     assert.equal(otp2p.text(), 'aa');
     assert.deepEqual(
@@ -328,7 +328,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'a';
     otp2p.typeModel = {"charLength":1,"totalLength":2,"data":[1, "a"]};
 
-    otp2p.insert('b', 1);
+    otp2p.insert(1, 'b');
 
     assert.equal(otp2p.text(), 'ab');
     assert.deepEqual(
@@ -340,7 +340,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'a';
     otp2p.typeModel = {"charLength":1,"totalLength":3,"data":[1, 'a', 1]};
 
-    otp2p.insert('b', 1);
+    otp2p.insert(1, 'b');
 
     assert.equal(otp2p.text(), 'ab');
     assert.deepEqual(
@@ -438,7 +438,7 @@ describe('OTP2P Tests', function () {
 
   it('does add multiple characters', function () {
     // inserts first two characters
-    otp2p.insert('aa', 0);
+    otp2p.insert(0, 'aa');
     assert.equal(otp2p.text(), 'aa');
     assert.deepEqual(
       otp2p.typeModel,
@@ -449,7 +449,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'c';
     otp2p.typeModel = {"charLength":1,"totalLength":1,"data":["c"]};
 
-    otp2p.insert('ab', 0);
+    otp2p.insert(0, 'ab');
 
     assert.equal(otp2p.text(), 'abc');
     assert.deepEqual(
@@ -461,7 +461,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'a';
     otp2p.typeModel = {"charLength":1,"totalLength":1,"data":["a"]};
 
-    otp2p.insert('bc', 1);
+    otp2p.insert(1, 'bc');
 
     assert.equal(otp2p.text(), 'abc');
     assert.deepEqual(
@@ -473,7 +473,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = '';
     otp2p.typeModel = {"charLength":0,"totalLength":1,"data":[1]};
 
-    otp2p.insert('ab', 0);
+    otp2p.insert(0, 'ab');
 
     assert.equal(otp2p.text(), 'ab');
     assert.deepEqual(
@@ -486,7 +486,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'a';
     otp2p.typeModel = {"charLength":1,"totalLength":1,"data":[1, "a"]};
 
-    otp2p.insert('bc', 1);
+    otp2p.insert(1, 'bc');
 
     assert.equal(otp2p.text(), 'abc');
     assert.deepEqual(
@@ -499,7 +499,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'ad';
     otp2p.typeModel = {"charLength":2,"totalLength":2,"data":["ad"]};
 
-    otp2p.insert('bc', 1);
+    otp2p.insert(1, 'bc');
 
     assert.equal(otp2p.text(), 'abcd');
     assert.deepEqual(
@@ -512,7 +512,7 @@ describe('OTP2P Tests', function () {
     otp2p.view = 'ad';
     otp2p.typeModel = {"charLength":2,"totalLength":4,"data":[1, "ad", 1]};
 
-    otp2p.insert('bc', 1);
+    otp2p.insert(1, 'bc');
 
     assert.equal(otp2p.text(), 'abcd');
     assert.deepEqual(
@@ -526,7 +526,7 @@ describe('OTP2P Tests', function () {
     otp2p.typeModel =
       {"charLength":2,"totalLength":5,"data":[1, "a", 1, 'd', 1]};
 
-    otp2p.insert('bc', 1);
+    otp2p.insert(1, 'bc');
 
     assert.equal(otp2p.text(), 'abcd');
     assert.deepEqual(

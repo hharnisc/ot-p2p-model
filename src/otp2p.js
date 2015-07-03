@@ -49,7 +49,7 @@ class OTP2P {
     return model.filter((item) => !that.isTombstone(item)).join('');
   }
 
-  insert(chars, index) {
+  insert(index, chars) {
     if (index > this.view.length || index < 0) {
       throw new Error("Index is out of range")
     }
