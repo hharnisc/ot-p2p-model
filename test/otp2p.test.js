@@ -992,4 +992,154 @@ describe('OTP2P Tests', function () {
       }
     );
   });
+
+  it('does remote insert operations', function () {
+    // insert first char
+    otp2p.remoteInsert(0, 'a');
+    assert.equal(otp2p.text(), 'a');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":1,
+        "totalLength":1,
+        "data": ['a']
+      }
+    );
+
+    // insert last char
+    otp2p.view = 'ab';
+    otp2p.typeModel = {
+      "charLength":2,
+      "totalLength":2,
+      "data": ['ab']
+    };
+
+    otp2p.remoteInsert(2, 'c');
+    assert.equal(otp2p.text(), 'abc');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":3,
+        "totalLength":3,
+        "data": ['abc']
+      }
+    );
+
+    // insert middle char
+    otp2p.view = 'ac';
+    otp2p.typeModel = {
+      "charLength":2,
+      "totalLength":2,
+      "data": ['ac']
+    };
+
+    otp2p.remoteInsert(1, 'b');
+    assert.equal(otp2p.text(), 'abc');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":3,
+        "totalLength":3,
+        "data": ['abc']
+      }
+    );
+
+    // insert first char with trailing tombstones
+    otp2p.view = 'a';
+    otp2p.typeModel = {
+      "charLength":1,
+      "totalLength":2,
+      "data": ['a', 1]
+    };
+
+    otp2p.remoteInsert(1, 'b');
+    assert.equal(otp2p.text(), 'ab');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":2,
+        "totalLength":3,
+        "data": ['ab', 1]
+      }
+    );
+
+    // insert last char with preceding tombstones
+    otp2p.view = 'b';
+    otp2p.typeModel = {
+      "charLength":1,
+      "totalLength":2,
+      "data": [1, 'b']
+    };
+
+    otp2p.remoteInsert(1, 'a');
+    assert.equal(otp2p.text(), 'ab');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":2,
+        "totalLength":3,
+        "data": [1, 'ab']
+      }
+    );
+  });
+
+  it('does remote insert multiple chars', function () {
+    // insert first 2 chars
+    otp2p.view = 'c';
+    otp2p.typeModel = {
+      "charLength":1,
+      "totalLength":1,
+      "data": ['c']
+    };
+
+    otp2p.remoteInsert(0, 'ab');
+    assert.equal(otp2p.text(), 'abc');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":3,
+        "totalLength":3,
+        "data": ['abc']
+      }
+    );
+
+    // insert last 2 chars
+    otp2p.view = 'a';
+    otp2p.typeModel = {
+      "charLength":1,
+      "totalLength":1,
+      "data": ['a']
+    };
+
+    otp2p.remoteInsert(1, 'bc');
+    assert.equal(otp2p.text(), 'abc');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":3,
+        "totalLength":3,
+        "data": ['abc']
+      }
+    );
+
+    // insert middle 2 chars
+    otp2p.view = 'ad';
+    otp2p.typeModel = {
+      "charLength":2,
+      "totalLength":2,
+      "data": ['ad']
+    };
+
+    otp2p.remoteInsert(1, 'bc');
+    assert.equal(otp2p.text(), 'abcd');
+    assert.deepEqual(
+      otp2p.typeModel,
+      {
+        "charLength":4,
+        "totalLength":4,
+        "data": ['abcd']
+      }
+    );
+  });
+
 });

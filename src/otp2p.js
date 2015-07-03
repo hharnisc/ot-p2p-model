@@ -84,6 +84,17 @@ class OTP2P {
     this.typeModel = type.apply(this.typeModel, op);
   }
 
+  remoteInsert(modelIndex, chars) {
+    var op = this.generateRemoteOp(
+      {'i': chars},
+      modelIndex,
+      type.serialize(this.typeModel)
+    )
+
+    this.typeModel = type.apply(this.typeModel, op);
+    this.view = this.modelItemsToView(type.serialize(this.typeModel))
+  }
+
   remoteDelete(modelIndex, numchars=1) {
     var op = this.generateRemoteOp(
       {'d': numchars},
