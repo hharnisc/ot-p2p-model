@@ -1272,4 +1272,46 @@ describe('OTP2P Tests', function () {
     });
     evOtp2p.remoteDelete(3, 3);
   });
+
+  it('does emit broadcast insert on local insert', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.view = '';
+    evOtp2p.typeModel = {
+      "charLength":0,
+      "totalLength":0,
+      "data": []
+    };
+
+    evOtp2p.on('broadcast', (command) => {
+      assert.deepEqual(command, {
+        type: 'insert',
+        index: 0,
+        value: 'a'
+      });
+      done();
+    });
+
+    evOtp2p.insert(0, 'a');
+  });
+
+  it('does emit broadcast insert on local insert multiple', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.view = 'abe';
+    evOtp2p.typeModel = {
+      "charLength":3,
+      "totalLength":7,
+      "data": [1, 'a', 1, 'b', 1, 'e', 1]
+    };
+
+    evOtp2p.on('broadcast', (command) => {
+      assert.deepEqual(command, {
+        type: 'insert',
+        index: 5,
+        value: 'cd'
+      });
+      done();
+    });
+
+    evOtp2p.insert(2, 'cd');
+  });
 });

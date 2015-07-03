@@ -17,11 +17,11 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 **Latest Version** 0.0.1
 
-- WIP
+- Initial implementation, updates a local and remote models, emits insert, remove and broadcast events.
 
 ## TODO
 
-- Observables
+- Nothing for now, bugfixes as they come along
 
 ## Quick Start
 
@@ -90,3 +90,7 @@ otp2pModel.deleteRemote(modelIndex, numchars=1)
 
 **modelIndex** - (zero base) location of where to insert the string in the model  
 **numchars** - the number of trailing characters to delete (default=1)
+
+### Observables
+
+**Insert** and **delete** events are emitted whenever local or remote commands are detected. The commands are are translated to local commands to prepare for updating something like a text input.

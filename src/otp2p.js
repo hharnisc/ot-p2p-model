@@ -94,8 +94,18 @@ class OTP2P extends EventEmitter {
       chars,
       this.view.slice(index)
     ].join('');
+
     this.typeModel = type.apply(this.typeModel, op)
     this.emit('insert', {index: index, value: chars});
+    this.emit('broadcast', {
+      type: 'insert',
+      index: this.viewToModelIndex(
+        index,
+        this.view,
+        type.serialize(this.typeModel)
+      ),
+      value: chars
+    });
   }
 
   delete(index, numChars=1) {
