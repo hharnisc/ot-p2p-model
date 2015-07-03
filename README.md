@@ -39,6 +39,10 @@ otp2pModel.on('insert', (command) => {
   console.log(otp2pModel.text());
 });
 
+otp2pModel.on('broadcast', (command) => {
+  console.log(command); // log the broadcast details
+});
+
 // single character operations
 otp2pModel.insert('a', 0); // insert `a` at 0
 otp2pModel.delete(0); // delete `a` at 0
@@ -103,4 +107,14 @@ otp2pModel.deleteRemote(modelIndex, numchars=1)
 
 ### Observables
 
-**Insert** and **delete** events are emitted whenever local or remote commands are detected. The commands are are translated to local commands to prepare for updating something like a text input.
+#### insert
+
+Emitted whenever local or remote insert commands are detected. If the command is remote indexes are converted to local.
+
+#### delete
+
+Emitted whenever local or remote delete commands are detected. If the command is remote indexes are converted to local.
+
+#### broadcast
+
+Emitted whenever local insert or delete commands have been completed, commands are converted to remote
