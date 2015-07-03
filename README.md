@@ -21,7 +21,6 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 ## TODO
 
-- Remote operations
 - Observables
 
 ## Quick Start
