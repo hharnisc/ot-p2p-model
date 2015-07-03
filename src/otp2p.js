@@ -1,10 +1,12 @@
 'use strict';
 
+var EventEmitter = require('eventemitter3');
 var type = require('ot-text-tp2').type;
 var _ = require('lodash');
 
-class OTP2P {
+class OTP2P extends EventEmitter {
   constructor(doc='') {
+    super();
     this.view = doc;
     this.typeModel = type.create(doc);
   }
@@ -67,6 +69,7 @@ class OTP2P {
       this.view.slice(index)
     ].join('');
     this.typeModel = type.apply(this.typeModel, op)
+    this.emit('insert', {index: index, value: chars});
   }
 
   delete(index, numChars=1) {
@@ -82,6 +85,7 @@ class OTP2P {
       this.view.slice(index + numChars)
     ].join('');
     this.typeModel = type.apply(this.typeModel, op);
+    this.emit('delete', {index: index, numChars: numChars});
   }
 
   remoteInsert(modelIndex, chars) {

@@ -1142,4 +1142,36 @@ describe('OTP2P Tests', function () {
     );
   });
 
+  it('does call observable on insert', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.on('insert', (command) => {
+      assert.deepEqual(command, {
+        index: 0,
+        value: 'ab'
+      });
+      done();
+    })
+    evOtp2p.insert(0, 'ab');
+  });
+
+  it('does call observable on delete', function (done) {
+    var evOtp2p = new OTP2P();
+
+    evOtp2p.view = 'ab';
+    evOtp2p.typeModel = {
+      "charLength":2,
+      "totalLength":2,
+      "data": ['ab']
+    };
+
+    evOtp2p.on('delete', (command) => {
+      assert.deepEqual(command, {
+        index: 0,
+        numChars: 2
+      });
+      done();
+    });
+    evOtp2p.delete(0, 2);
+  });
+
 });

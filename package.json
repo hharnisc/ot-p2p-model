@@ -6,6 +6,7 @@
   "dependencies":
   {
     "ot-text-tp2": "^1.0.0",
+    "eventemitter3": "^1.1.1",
     "lodash": "^3.9.3"
   },
   "devDependencies": {

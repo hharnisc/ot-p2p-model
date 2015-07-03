@@ -29,6 +29,14 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 var OTP2PModel = require('otp2p-model');
 var otp2pModel = new OTP2PModel();
 
+otp2pModel.on('delete', (command) => {
+  console.log(command); // log the delete details
+});
+
+otp2pModel.on('insert', (command) => {
+  console.log(command); // log the insert details
+});
+
 // single character operations
 otp2pModel.insert('a', 0); // insert `a` at 0
 otp2pModel.delete(0); // delete `a` at 0
