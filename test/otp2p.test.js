@@ -1174,4 +1174,51 @@ describe('OTP2P Tests', function () {
     evOtp2p.delete(0, 2);
   });
 
+  it('does convert model index to view index', function () {
+    // first item
+    assert.equal(otp2p.modelIndexToViewIndex(0, []), 0);
+
+    // second item
+    assert.equal(otp2p.modelIndexToViewIndex(1, ['a']), 1);
+
+    // middle item
+    assert.equal(otp2p.modelIndexToViewIndex(1, ['abc']), 1);
+
+    // preceding tombstone
+    assert.equal(otp2p.modelIndexToViewIndex(1, [1, 'a']), 0);
+
+    // trailing tombstone
+    assert.equal(otp2p.modelIndexToViewIndex(0, ['a', 1]), 0);
+  });
+
+  it('does call observable on remote insert', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.on('insert', (command) => {
+      assert.deepEqual(command, {
+        index: 0,
+        value: 'ab'
+      });
+      done();
+    });
+    evOtp2p.remoteInsert(0, 'ab');
+  });
+
+  it('does call observable on remote insert with tombstones', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.view = 'a';
+    evOtp2p.typeModel = {
+      "charLength":1,
+      "totalLength":3,
+      "data": [1, 'a', 1]
+    };
+
+    evOtp2p.on('insert', (command) => {
+      assert.deepEqual(command, {
+        index: 0,
+        value: 'b'
+      });
+      done();
+    });
+    evOtp2p.remoteInsert(1, 'b');
+  });
 });

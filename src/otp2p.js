@@ -42,6 +42,20 @@ class OTP2P extends EventEmitter {
     return curModelIndex;
   }
 
+  modelIndexToViewIndex(modelIndex, model) {
+    var that = this;
+    var numberTombstones =
+      model
+      .reduce((p, c, i, a) => {
+        if (that.isTombstone(c) && i <= modelIndex) {
+          return p + c;
+        } else {
+          return p;
+        }
+      }, 0);
+    return modelIndex - numberTombstones;
+  }
+
   isTombstone(item) {
     return _.isNumber(item)
   }
@@ -96,7 +110,12 @@ class OTP2P extends EventEmitter {
     )
 
     this.typeModel = type.apply(this.typeModel, op);
-    this.view = this.modelItemsToView(type.serialize(this.typeModel))
+    this.view = this.modelItemsToView(type.serialize(this.typeModel));
+    this.emit('insert', {
+      index: this.modelIndexToViewIndex(modelIndex, type.serialize(this.typeModel)),
+      value: chars
+      }
+    );
   }
 
   remoteDelete(modelIndex, numchars=1) {
@@ -107,7 +126,7 @@ class OTP2P extends EventEmitter {
     )
 
     this.typeModel = type.apply(this.typeModel, op);
-    this.view = this.modelItemsToView(type.serialize(this.typeModel))
+    this.view = this.modelItemsToView(type.serialize(this.typeModel));
   }
 
   generateRemoteOp(baseOp, modelIndex, model) {
