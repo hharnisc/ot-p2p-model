@@ -31,10 +31,12 @@ var otp2pModel = new OTP2PModel();
 
 otp2pModel.on('delete', (command) => {
   console.log(command); // log the delete details
+  console.log(otp2pModel.text());
 });
 
 otp2pModel.on('insert', (command) => {
   console.log(command); // log the insert details
+  console.log(otp2pModel.text());
 });
 
 // single character operations
@@ -47,6 +49,14 @@ otp2pModel.delete(1, 4); // delete 'ello'
 ```
 
 ## Usage
+
+### text
+
+Visible text representation of the model
+
+```javascript
+otp2pModel.text()
+```
 
 ### insert
 

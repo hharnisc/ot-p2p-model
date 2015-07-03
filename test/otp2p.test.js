@@ -1294,6 +1294,16 @@ describe('OTP2P Tests', function () {
     evOtp2p.insert(0, 'a');
   });
 
+  it('does calculate number of effected chars in model', function () {
+    assert.equal(otp2p.viewEffectedToModelEffected(0, 1, 'a', ['a']), 1);
+    assert.equal(
+      otp2p.viewEffectedToModelEffected(
+        0, 2, 'abc', [1, 'a', 1, 'b', 1, 'c', 1]
+      ),
+      3
+    );
+  });
+
   it('does emit broadcast insert on local insert multiple', function (done) {
     var evOtp2p = new OTP2P();
     evOtp2p.view = 'abe';
@@ -1313,5 +1323,26 @@ describe('OTP2P Tests', function () {
     });
 
     evOtp2p.insert(2, 'cd');
+  });
+
+  it('does emit broadcast on local delete', function (done) {
+    var evOtp2p = new OTP2P();
+    evOtp2p.view = 'a';
+    evOtp2p.typeModel = {
+      "charLength":1,
+      "totalLength":1,
+      "data": ['a']
+    };
+
+    evOtp2p.on('broadcast', (command) => {
+      assert.deepEqual(command, {
+        type: 'delete',
+        index: 0,
+        numChars: 1
+      });
+      done();
+    });
+
+    evOtp2p.delete(0);
   });
 });

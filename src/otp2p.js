@@ -77,6 +77,20 @@ class OTP2P extends EventEmitter {
     return numEffected - tombstonesBetween;
   }
 
+  viewEffectedToModelEffected(index, numEffected, view, model) {
+    var that = this;
+    var first = this.viewToModelIndex(index, view, model);
+    var last = this.viewToModelIndex(index + numEffected - 1, view, model);
+    var tombstonesBetween = model.reduce((p, c, i, a) => {
+      if (i > first && i < last && that.isTombstone(c)) {
+        return p + c;
+      } else {
+        return p;
+      }
+    }, 0);
+    return numEffected + tombstonesBetween;
+  }
+
   insert(index, chars) {
     if (index > this.view.length || index < 0) {
       throw new Error("Index is out of range")
@@ -116,12 +130,29 @@ class OTP2P extends EventEmitter {
       type.serialize(this.typeModel)
     );
 
+    var modelNumChars = this.viewEffectedToModelEffected(
+     index,
+     numChars,
+     this.view,
+     type.serialize(this.typeModel)
+   )
+
     this.view = [
       this.view.slice(0, index),
       this.view.slice(index + numChars)
     ].join('');
     this.typeModel = type.apply(this.typeModel, op);
+
     this.emit('delete', {index: index, numChars: numChars});
+    this.emit('broadcast', {
+      type: 'delete',
+      index: this.viewToModelIndex(
+        index,
+        this.view,
+        type.serialize(this.typeModel)
+      ),
+      numChars: modelNumChars
+    });
   }
 
   remoteInsert(modelIndex, chars) {
