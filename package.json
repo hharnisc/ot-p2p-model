@@ -1,8 +1,8 @@
 {
-  "name": "otp2p",
+  "name": "ot-p2p-model",
   "version": "0.0.1",
-  "description": "Operational Transform Suitable For P2P",
-  "main": "./lib/otp2p.js",
+  "description": "Operational Transform Model Suitable For P2P",
+  "main": "./lib/ot-p2p-model.js",
   "dependencies":
   {
     "ot-text-tp2": "^1.0.0",
@@ -16,12 +16,13 @@
   },
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha --compilers js:babel/register",
-    "tdd":  "./node_modules/mocha/bin/mocha --compilers js:babel/register --watch"
+    "tdd":  "./node_modules/mocha/bin/mocha --compilers js:babel/register --watch",
+    "prepublish": "babel src --out-dir lib"
   },
   "author": "Harrison Harnisch <hharnisc@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/hharnisc/ot-p2p-model.git"
   }
 }
