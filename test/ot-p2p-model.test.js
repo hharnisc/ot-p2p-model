@@ -670,6 +670,25 @@ describe('OTP2PModel Tests', function () {
       }
     );
 
+    otp2pModel.view = 'abcdef';
+    otp2pModel.typeModel = {
+      "charLength":6,
+      "totalLength":9,
+      "data": ['ab', 2, 'c', 1 ,'def']
+    };
+
+    otp2pModel.delete(2, 2);
+
+    assert.equal(otp2pModel.text(), 'abef');
+    assert.deepEqual(
+      otp2pModel.typeModel,
+      {
+        "charLength":4,
+        "totalLength":9,
+        "data": ['ab', 5, 'ef']
+      }
+    );
+
   });
 
   it('does generate remote op', function () {
@@ -1296,12 +1315,21 @@ describe('OTP2PModel Tests', function () {
 
   it('does calculate number of effected chars in model', function () {
     assert.equal(otp2pModel.viewEffectedToModelEffected(0, 1, 'a', ['a']), 1);
+
     assert.equal(
       otp2pModel.viewEffectedToModelEffected(
         0, 2, 'abc', [1, 'a', 1, 'b', 1, 'c', 1]
       ),
       3
     );
+
+    assert.equal(
+      otp2pModel.viewEffectedToModelEffected(
+        2, 2, 'abcdef', ['ab', 2, 'c', 1, 'def']
+      ),
+      3
+    );
+
   });
 
   it('does emit broadcast insert on local insert multiple', function (done) {
@@ -1344,5 +1372,27 @@ describe('OTP2PModel Tests', function () {
     });
 
     evOtp2p.delete(0);
+  });
+
+  it('does emit broadcast on local delete multiple', function (done) {
+    var evOtp2p = new OTP2PModel();
+    evOtp2p.view = 'abcdef';
+    evOtp2p.typeModel = {
+      "charLength":6,
+      "totalLength":9,
+      "data": ['ab', 2, 'c', 1 ,'def']
+    };
+
+    evOtp2p.on('broadcast', (command) => {
+      assert.deepEqual(command, {
+        type: 'delete',
+        index: 4,
+        numChars: 3
+      });
+      done();
+    });
+
+    evOtp2p.delete(2, 2);
+
   });
 });

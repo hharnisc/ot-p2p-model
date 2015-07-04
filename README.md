@@ -15,7 +15,11 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 ## History
 
-**Latest Version** 0.0.1
+**Latest Version** 0.0.2
+
+- Bugfix - deleting multiple characters was broadcasting the wrong index
+
+**Version** 0.0.1
 
 - Initial implementation, updates a local and remote models, emits insert, remove and broadcast events.
 

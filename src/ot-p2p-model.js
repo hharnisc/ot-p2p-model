@@ -81,13 +81,21 @@ class OTP2P extends EventEmitter {
     var that = this;
     var first = this.viewToModelIndex(index, view, model);
     var last = this.viewToModelIndex(index + numEffected - 1, view, model);
-    var tombstonesBetween = model.reduce((p, c, i, a) => {
-      if (i > first && i < last && that.isTombstone(c)) {
-        return p + c;
+    var acutualIndex = 0;
+    var tombstonesBetween = 0;
+
+    for (var i = 0; i < model.length; i++) {
+      var curModel = model[i];
+      if (this.isTombstone(curModel)) {
+        if (acutualIndex > first && acutualIndex < last) {
+          tombstonesBetween += curModel;
+        }
+        acutualIndex += model[i];
       } else {
-        return p;
+        acutualIndex += model[i].length;
       }
-    }, 0);
+    }
+
     return numEffected + tombstonesBetween;
   }
 
@@ -130,12 +138,18 @@ class OTP2P extends EventEmitter {
       type.serialize(this.typeModel)
     );
 
+    var broadcastModelIndex = this.viewToModelIndex(
+      index,
+      this.view,
+      type.serialize(this.typeModel)
+    );
+
     var modelNumChars = this.viewEffectedToModelEffected(
      index,
      numChars,
      this.view,
      type.serialize(this.typeModel)
-   )
+    );
 
     this.view = [
       this.view.slice(0, index),
@@ -146,11 +160,7 @@ class OTP2P extends EventEmitter {
     this.emit('delete', {index: index, numChars: numChars});
     this.emit('broadcast', {
       type: 'delete',
-      index: this.viewToModelIndex(
-        index,
-        this.view,
-        type.serialize(this.typeModel)
-      ),
+      index: broadcastModelIndex,
       numChars: modelNumChars
     });
   }

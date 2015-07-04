@@ -1,6 +1,6 @@
 {
   "name": "ot-p2p-model",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Operational Transform Model Suitable For P2P",
   "main": "./lib/ot-p2p-model.js",
   "dependencies":
