@@ -15,7 +15,11 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 ## History
 
-**Latest Version** 0.0.2
+**Latest Version** 0.0.3
+
+- Bugfix - view to model index translation was reporting incorrect view index
+
+**Version** 0.0.2
 
 - Bugfix - deleting multiple characters was broadcasting the wrong index
 

@@ -15,90 +15,6 @@ class OTP2P extends EventEmitter {
     return this.view;
   }
 
-  viewToModelIndex(viewIndex, view, model) {
-    if (view !== this.modelItemsToView(model))
-      throw new Error("Model and view don't match");
-    if (viewIndex < 0 ) throw new Error("Index is out of range");
-
-    if (view.length === 0 && viewIndex === 0) return 0;
-    if (viewIndex === view.length)
-      return this.lastVisibleCharacterIndex(model) + 1;
-
-    var curModelIndex = 0;
-    var curViewIndex = 0;
-    var modelIndex = 0;
-
-    // TODO: rewrite this with a for loop
-    while (curViewIndex <= viewIndex) {
-      var modelItem = model[modelIndex];
-      if (this.isTombstone(modelItem)) {
-        curModelIndex += modelItem;
-      } else {
-        curModelIndex += Math.min(viewIndex - curViewIndex, modelItem.length);
-        curViewIndex += modelItem.length;
-      }
-      modelIndex += 1;
-    }
-    return curModelIndex;
-  }
-
-  modelIndexToViewIndex(modelIndex, model) {
-    var that = this;
-    var numberTombstones =
-      model
-      .reduce((p, c, i, a) => {
-        if (that.isTombstone(c) && i <= modelIndex) {
-          return p + c;
-        } else {
-          return p;
-        }
-      }, 0);
-    return modelIndex - numberTombstones;
-  }
-
-  isTombstone(item) {
-    return _.isNumber(item)
-  }
-
-  modelItemsToView(model) {
-    var that = this;
-    return model.filter((item) => !that.isTombstone(item)).join('');
-  }
-
-  modelEffectedToViewEffected(modelIndex, numEffected, model) {
-    var that = this;
-    var tombstonesBetween = model.reduce((p, c, i, a) => {
-      if (i > modelIndex && i < modelIndex + numEffected && that.isTombstone(c)) {
-        return p + c;
-      } else {
-        return p;
-      }
-    }, 0);
-    return numEffected - tombstonesBetween;
-  }
-
-  viewEffectedToModelEffected(index, numEffected, view, model) {
-    var that = this;
-    var first = this.viewToModelIndex(index, view, model);
-    var last = this.viewToModelIndex(index + numEffected - 1, view, model);
-    var acutualIndex = 0;
-    var tombstonesBetween = 0;
-
-    for (var i = 0; i < model.length; i++) {
-      var curModel = model[i];
-      if (this.isTombstone(curModel)) {
-        if (acutualIndex > first && acutualIndex < last) {
-          tombstonesBetween += curModel;
-        }
-        acutualIndex += model[i];
-      } else {
-        acutualIndex += model[i].length;
-      }
-    }
-
-    return numEffected + tombstonesBetween;
-  }
-
   insert(index, chars) {
     if (index > this.view.length || index < 0) {
       throw new Error("Index is out of range")
@@ -252,6 +168,90 @@ class OTP2P extends EventEmitter {
     if (trailingChars > 0) op.push(trailingChars);
     return op;
   }
+
+  viewToModelIndex(viewIndex, view, model) {
+    if (view !== this.modelItemsToView(model))
+      throw new Error("Model and view don't match");
+    if (viewIndex < 0 ) throw new Error("Index is out of range");
+
+    if (view.length === 0 && viewIndex === 0) return 0;
+    if (viewIndex === view.length)
+      return this.lastVisibleCharacterIndex(model) + 1;
+
+    var curModelIndex = 0;
+    var curViewIndex = 0;
+    var modelIndex = 0;
+
+    // TODO: rewrite this with a for loop
+    while (curViewIndex <= viewIndex) {
+      var modelItem = model[modelIndex];
+      if (this.isTombstone(modelItem)) {
+        curModelIndex += modelItem;
+      } else {
+        curModelIndex += Math.min(viewIndex - curViewIndex, modelItem.length);
+        curViewIndex += modelItem.length;
+      }
+      modelIndex += 1;
+    }
+    return curModelIndex;
+  }
+
+  modelIndexToViewIndex(modelIndex, model) {
+    // count all of the tombstones before the modelIndex
+    var numberTombstones = this.countTombstonesInRange(
+      0,
+      modelIndex,
+      model
+    );
+    return modelIndex - numberTombstones;
+  }
+
+  isTombstone(item) {
+    return _.isNumber(item)
+  }
+
+  modelItemsToView(model) {
+    var that = this;
+    return model.filter((item) => !that.isTombstone(item)).join('');
+  }
+
+  modelEffectedToViewEffected(modelIndex, numEffected, model) {
+    return numEffected -
+    this.countTombstonesInRange(
+      modelIndex,
+      modelIndex + numEffected,
+      model
+    );
+  }
+
+  viewEffectedToModelEffected(index, numEffected, view, model) {
+    var first = this.viewToModelIndex(index, view, model);
+    var last = this.viewToModelIndex(index + numEffected - 1, view, model);
+    var tombstonesBetween = this.countTombstonesInRange(first, last, model);
+    return numEffected + tombstonesBetween;
+  }
+
+  countTombstonesInRange(start, end, model) {
+    var tombstonesInRange = 0;
+    var realIndex = 0;
+    for (var i = 0; i < model.length; i++) {
+      var curModel = model[i];
+      if (this.isTombstone(curModel)) {
+        var x1 = realIndex;
+        var x2 = realIndex + curModel;
+        var y1 = start;
+        var y2 = end;
+        if (Math.max(x1,y1) < Math.min(x2,y2)) {
+          tombstonesInRange += (Math.min(x2,y2) - Math.max(x1,y1));
+        }
+        realIndex += curModel;
+      } else {
+        realIndex += curModel.length;
+      }
+    }
+    return tombstonesInRange;
+  }
+
 
   modelLength(model) {
     if (model.length === 0) return 0;

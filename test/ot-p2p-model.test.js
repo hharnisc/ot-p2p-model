@@ -1209,6 +1209,16 @@ describe('OTP2PModel Tests', function () {
     // trailing tombstone
     assert.equal(otp2pModel.modelIndexToViewIndex(0, ['a', 1]), 0);
 
+    assert.equal(otp2pModel.modelIndexToViewIndex(0, [4]), 0);
+
+  });
+
+  it('does count tombstones in range', function () {
+    assert.equal(otp2pModel.countTombstonesInRange(0, 1, ['a']), 0);
+    assert.equal(otp2pModel.countTombstonesInRange(0, 1, [1, 'a']), 1);
+    assert.equal(otp2pModel.countTombstonesInRange(0, 1, ['a', 1]), 0);
+    assert.equal(otp2pModel.countTombstonesInRange(0, 4, [4]), 4);
+    assert.equal(otp2pModel.countTombstonesInRange(1, 4, [4]), 3);
   });
 
   it('does call observable on remote insert', function (done) {
