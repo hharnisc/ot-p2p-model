@@ -15,7 +15,11 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 ## History
 
-**Latest Version** 0.0.3
+**Latest Version** 0.0.4
+
+- Linting!
+
+**Version** 0.0.3
 
 - Bugfix - view to model index translation was reporting incorrect view index
 
