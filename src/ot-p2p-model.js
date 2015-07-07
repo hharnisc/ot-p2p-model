@@ -1,11 +1,12 @@
-'use strict';
+"use strict";
 
-var EventEmitter = require('eventemitter3');
-var type = require('ot-text-tp2').type;
-var _ = require('lodash');
+var EventEmitter = require("eventemitter3");
+var type = require("ot-text-tp2").type;
+var _ = require("lodash");
 
 class OTP2P extends EventEmitter {
-  constructor(doc='') {
+
+  constructor(doc="") {
     super();
     this.view = doc;
     this.typeModel = type.create(doc);
@@ -17,11 +18,11 @@ class OTP2P extends EventEmitter {
 
   insert(index, chars) {
     if (index > this.view.length || index < 0) {
-      throw new Error("Index is out of range")
+      throw new Error("Index is out of range");
     }
 
     var op = this.generateOp(
-      { 'i': chars },
+      { "i": chars },
       index,
       this.view,
       type.serialize(this.typeModel)
@@ -31,12 +32,12 @@ class OTP2P extends EventEmitter {
       this.view.slice(0, index),
       chars,
       this.view.slice(index)
-    ].join('');
+    ].join("");
 
-    this.typeModel = type.apply(this.typeModel, op)
-    this.emit('insert', {index: index, value: chars});
-    this.emit('broadcast', {
-      type: 'insert',
+    this.typeModel = type.apply(this.typeModel, op);
+    this.emit("insert", {index: index, value: chars});
+    this.emit("broadcast", {
+      type: "insert",
       index: this.viewToModelIndex(
         index,
         this.view,
@@ -48,7 +49,7 @@ class OTP2P extends EventEmitter {
 
   delete(index, numChars=1) {
     var op = this.generateOp(
-      {'d':numChars},
+      {"d": numChars},
       index,
       this.view,
       type.serialize(this.typeModel)
@@ -70,12 +71,12 @@ class OTP2P extends EventEmitter {
     this.view = [
       this.view.slice(0, index),
       this.view.slice(index + numChars)
-    ].join('');
+    ].join("");
     this.typeModel = type.apply(this.typeModel, op);
 
-    this.emit('delete', {index: index, numChars: numChars});
-    this.emit('broadcast', {
-      type: 'delete',
+    this.emit("delete", {index: index, numChars: numChars});
+    this.emit("broadcast", {
+      type: "delete",
       index: broadcastModelIndex,
       numChars: modelNumChars
     });
@@ -83,14 +84,14 @@ class OTP2P extends EventEmitter {
 
   remoteInsert(modelIndex, chars) {
     var op = this.generateRemoteOp(
-      {'i': chars},
+      {"i": chars},
       modelIndex,
       type.serialize(this.typeModel)
     );
 
     this.typeModel = type.apply(this.typeModel, op);
     this.view = this.modelItemsToView(type.serialize(this.typeModel));
-    this.emit('insert', {
+    this.emit("insert", {
       index: this.modelIndexToViewIndex(modelIndex, type.serialize(this.typeModel)),
       value: chars
       }
@@ -99,7 +100,7 @@ class OTP2P extends EventEmitter {
 
   remoteDelete(modelIndex, numChars=1) {
     var op = this.generateRemoteOp(
-      {'d': numChars},
+      {"d": numChars},
       modelIndex,
       type.serialize(this.typeModel)
     );
@@ -115,7 +116,7 @@ class OTP2P extends EventEmitter {
 
     this.typeModel = type.apply(this.typeModel, op);
     this.view = this.modelItemsToView(type.serialize(this.typeModel));
-    this.emit('delete', {
+    this.emit("delete", {
       index: viewIndex,
       numChars: viewNumEffected
     });
@@ -123,7 +124,9 @@ class OTP2P extends EventEmitter {
 
   generateRemoteOp(baseOp, modelIndex, model) {
     var op = [];
-    if(modelIndex > 0) op.push(modelIndex);
+    if(modelIndex > 0){
+      op.push(modelIndex);
+    }
 
     op.push(baseOp);
 
@@ -132,7 +135,9 @@ class OTP2P extends EventEmitter {
     var charsEffected = isDeleteOp ? baseOp.d : baseOp.i.length;
     var newModelLength = isDeleteOp ? modelLength : modelLength + charsEffected;
     var trailingChars = newModelLength - modelIndex - charsEffected;
-    if (trailingChars > 0) op.push(trailingChars);
+    if (trailingChars > 0) {
+      op.push(trailingChars);
+    }
 
     return op;
   }
@@ -141,7 +146,9 @@ class OTP2P extends EventEmitter {
     var op = [];
 
     var modelIndex = this.viewToModelIndex(index, view, model);
-    if (modelIndex > 0) op.push(modelIndex);
+    if (modelIndex > 0) {
+      op.push(modelIndex);
+    }
 
     var isDeleteOp = !!baseOp.d;
     var charsEffected = isDeleteOp ? baseOp.d : baseOp.i.length;
@@ -155,7 +162,7 @@ class OTP2P extends EventEmitter {
       );
       charsEffected = lastVisibleIndex - modelIndex + 1;
       op.push({
-        'd': charsEffected
+        "d": charsEffected
       });
     } else {
       op.push(baseOp);
@@ -165,18 +172,22 @@ class OTP2P extends EventEmitter {
     var newModelLength = isDeleteOp ? modelLength : modelLength + charsEffected;
 
     var trailingChars = newModelLength - modelIndex - charsEffected;
-    if (trailingChars > 0) op.push(trailingChars);
+    if (trailingChars > 0) {
+      op.push(trailingChars);
+    }
     return op;
   }
 
   viewToModelIndex(viewIndex, view, model) {
-    if (view !== this.modelItemsToView(model))
+    if (view !== this.modelItemsToView(model)){
       throw new Error("Model and view don't match");
-    if (viewIndex < 0 ) throw new Error("Index is out of range");
-
-    if (view.length === 0 && viewIndex === 0) return 0;
-    if (viewIndex === view.length)
+    }
+    if (viewIndex < 0 ) { throw new Error("Index is out of range"); }
+    if (view.length === 0 && viewIndex === 0) { return 0; }
+    if (viewIndex === view.length){
       return this.lastVisibleCharacterIndex(model) + 1;
+    }
+
 
     var curModelIndex = 0;
     var curViewIndex = 0;
@@ -207,12 +218,12 @@ class OTP2P extends EventEmitter {
   }
 
   isTombstone(item) {
-    return _.isNumber(item)
+    return _.isNumber(item);
   }
 
   modelItemsToView(model) {
     var that = this;
-    return model.filter((item) => !that.isTombstone(item)).join('');
+    return model.filter((item) => !that.isTombstone(item)).join("");
   }
 
   modelEffectedToViewEffected(modelIndex, numEffected, model) {
@@ -241,8 +252,8 @@ class OTP2P extends EventEmitter {
         var x2 = realIndex + curModel;
         var y1 = start;
         var y2 = end;
-        if (Math.max(x1,y1) < Math.min(x2,y2)) {
-          tombstonesInRange += (Math.min(x2,y2) - Math.max(x1,y1));
+        if (Math.max(x1, y1) < Math.min(x2, y2)) {
+          tombstonesInRange += (Math.min(x2, y2) - Math.max(x1, y1));
         }
         realIndex += curModel;
       } else {
@@ -254,7 +265,7 @@ class OTP2P extends EventEmitter {
 
 
   modelLength(model) {
-    if (model.length === 0) return 0;
+    if (model.length === 0) { return 0; }
     var that = this;
     return model
     .map((item) => that.isTombstone(item) ? item : item.length)
@@ -262,7 +273,7 @@ class OTP2P extends EventEmitter {
   }
 
   lastVisibleCharacterIndex(model) {
-    if (model.length === 0) return;
+    if (model.length === 0) { return -1; }
     var trailingInvisible = 0;
     for (var i = model.length - 1; i >= 0; i--) {
       if (this.isTombstone(model[i])) {
@@ -271,7 +282,7 @@ class OTP2P extends EventEmitter {
         break;
       }
     }
-    if (i < 0 ) return;
+    if (i < 0 ) { return -1; }
     var modelLength = this.modelLength(model);
     return modelLength - trailingInvisible - 1;
   }
