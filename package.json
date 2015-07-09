@@ -4,9 +4,8 @@
   "description": "Operational Transform Model Suitable For P2P",
   "main": "./lib/ot-p2p-model.js",
   "dependencies": {
-    "ot-text-tp2": "^1.0.0",
-    "eventemitter3": "^1.1.1",
-    "lodash": "^3.9.3"
+    "ot-text-tp2": "https://github.com/hharnisc/text-tp2.git#dc9bbee75547b76e9d6defe909eb48cb6d3ecce1",
+    "eventemitter3": "^1.1.1"
   },
   "devDependencies": {
     "babel": "^5.6.14",
