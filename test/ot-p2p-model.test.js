@@ -21,4 +21,17 @@ describe("OTP2PModel Tests", function () {
     let prefilledModel = new OTP2PModel(text);
     assert.equal(prefilledModel.get(), text);
   });
+
+  it("does insert text into a document", function () {
+    let text = "new text";
+    model.insert(0, text);
+    assert.equal(model.get(), text);
+  });
+
+  it("does remove text from a document", function () {
+    let text = "hello";
+    let prefilledModel = new OTP2PModel(text);
+    prefilledModel.delete(0, 5);
+    assert.equal(prefilledModel.get(), "");
+  });
 });

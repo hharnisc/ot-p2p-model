@@ -29,6 +29,14 @@ class OTP2P extends EventEmitter {
   get() {
     return this[api].get();
   }
+
+  insert(index, text) {
+    this[api].insert(index, text, () => {});
+  }
+
+  delete(index, numChars) {
+    this[api].remove(index, numChars, () => {});
+  }
 }
 
 module.exports = OTP2P;
