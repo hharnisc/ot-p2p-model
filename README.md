@@ -15,7 +15,11 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 ## History
 
-**Latest Version** 0.0.4
+**Latest Version** 0.0.5
+
+- uses revisions to retroactively apply remote operations using [wayback](https://github.com/hharnisc/wayback)
+
+**Version** 0.0.4
 
 - Linting!
 
@@ -95,27 +99,16 @@ otp2pModel.delete(index, numchars=1)
 **index** - (zero based) location of where to insert the string  
 **numchars** - the number of trailing characters to delete (default=1)
 
-### remoteInsert
+### remoteOp
 
-Insert command from a remote source (another peer)
-
-```javascript
-otp2pModel.remoteInsert(modelIndex, string)
-```
-
-**modelIndex** - (zero base) location of where to insert the string in the model  
-**string** - a sequence of characters  
-
-### remoteDelete
-
-Delete command from a remote source (another peer)
+Do an operation from a remote source (another peer)
 
 ```javascript
-otp2pModel.deleteRemote(modelIndex, numchars=1)
+otp2pModel.remoteOp(parentRevision, op)
 ```
 
-**modelIndex** - (zero base) location of where to insert the string in the model  
-**numchars** - the number of trailing characters to delete (default=1)
+**parentRevision** - The revision to apply the operation
+**op** - an op that gets applied to the model (see [ot-text-tp2](https://github.com/ottypes/text-tp2) for more details)
 
 ### Observables
 
@@ -129,4 +122,4 @@ Emitted whenever local or remote delete commands are detected. If the command is
 
 #### broadcast
 
-Emitted whenever local insert or delete commands have been completed, commands are converted to remote
+Emitted whenever local insert or delete commands have been applied, returns a revision and the op applied
