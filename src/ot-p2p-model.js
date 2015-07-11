@@ -1,18 +1,21 @@
 "use strict";
 
-let EventEmitter = require("eventemitter3");
-let type = require("ot-text-tp2").type;
+import EventEmitter from "eventemitter3";
+import { type } from "ot-text-tp2";
+import { Wayback } from "wayback";
 
 const api = Symbol("api");
 const snapshot = Symbol("snapshot");
 const getSnapshot = Symbol("getSnapshot");
 const submitOp = Symbol("submitOp");
+const wayback = Symbol("wayback");
 
 class OTP2P extends EventEmitter {
 
   constructor(text="") {
     super();
     this[snapshot] = type.create(text);
+    this[wayback] = new Wayback();
     this[api] = type.api(
       this[getSnapshot].bind(this),
       this[submitOp].bind(this)
@@ -35,13 +38,13 @@ class OTP2P extends EventEmitter {
 
   insert(index, text) {
     this[api].insert(index, text, (op) => {
-      this.emit('broadcast', op);
+      this.emit('broadcast', { op: op, revision: this[wayback].push(op) });
     });
   }
 
   delete(index, numChars) {
     this[api].remove(index, numChars, (op) => {
-      this.emit('broadcast', op);
+      this.emit('broadcast', { op: op, revision: this[wayback].push(op) });
     });
   }
 }

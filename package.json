@@ -5,7 +5,8 @@
   "main": "./lib/ot-p2p-model.js",
   "dependencies": {
     "ot-text-tp2": "https://github.com/hharnisc/text-tp2.git#dc9bbee75547b76e9d6defe909eb48cb6d3ecce1",
-    "eventemitter3": "^1.1.1"
+    "eventemitter3": "^1.1.1",
+    "wayback": "^0.0.2"
   },
   "devDependencies": {
     "babel": "^5.6.14",

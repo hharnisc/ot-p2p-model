@@ -38,8 +38,9 @@ describe("OTP2PModel Tests", function () {
   it("does emit broadcast event on insert", function (done) {
     var evOtp2p = new OTP2PModel();
 
-    evOtp2p.on("broadcast", (op) => {
-      assert.deepEqual(op, [{i: "c"}]);
+    evOtp2p.on("broadcast", (data) => {
+      assert.notEqual(data.revision, undefined);
+      assert.deepEqual(data.op, [{i: "c"}]);
       done();
     });
 
@@ -50,8 +51,9 @@ describe("OTP2PModel Tests", function () {
     var evOtp2p = new OTP2PModel();
     evOtp2p.insert(0, "c");
 
-    evOtp2p.on("broadcast", (op) => {
-      assert.deepEqual(op, [{d: 1}]);
+    evOtp2p.on("broadcast", (data) => {
+      assert.notEqual(data.revision, undefined);
+      assert.deepEqual(data.op, [{d: 1}]);
       done();
     });
 
