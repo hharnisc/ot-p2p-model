@@ -10,7 +10,7 @@ const getSnapshot = Symbol("getSnapshot");
 const submitOp = Symbol("submitOp");
 const wayback = Symbol("wayback");
 
-class OTP2P extends EventEmitter {
+export class OTP2PModel extends EventEmitter {
 
   constructor(text="") {
     super();
@@ -29,7 +29,8 @@ class OTP2P extends EventEmitter {
   [submitOp](op, cb) {
     op = type.normalize(op);
     this[snapshot] = type.apply(this[snapshot], op);
-    cb(op);
+    let revision = this[wayback].push(op);
+    cb(op, revision);
   }
 
   get() {
@@ -37,16 +38,26 @@ class OTP2P extends EventEmitter {
   }
 
   insert(index, text) {
-    this[api].insert(index, text, (op) => {
-      this.emit('broadcast', { op: op, revision: this[wayback].push(op) });
+    this[api].insert(index, text, (op, revision) => {
+      this.emit('broadcast', { op: op, revision: revision});
     });
   }
 
   delete(index, numChars) {
-    this[api].remove(index, numChars, (op) => {
-      this.emit('broadcast', { op: op, revision: this[wayback].push(op) });
+    this[api].remove(index, numChars, (op, revision) => {
+      this.emit('broadcast', { op: op, revision: revision});
     });
   }
-}
 
-module.exports = OTP2P;
+  remoteOp(parent, op) {
+    if (parent === this[wayback].head()) {
+      this[submitOp](op, () => {});
+    } else {
+      let sequence = this[wayback].getSequence(parent);
+      let composedSequence = sequence.reduce((p, c) => {
+        return type.compose(p, c);
+      });
+      this[submitOp](type.transform(op, composedSequence, 'left'), () => {});
+    }
+  }
+}

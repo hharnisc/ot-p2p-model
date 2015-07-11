@@ -3,7 +3,7 @@
 /*global it*/
 
 let assert = require("assert");
-let OTP2PModel = require("../src/ot-p2p-model");
+import { OTP2PModel } from "../src/ot-p2p-model";
 
 describe("OTP2PModel Tests", function () {
   let model;
@@ -60,4 +60,62 @@ describe("OTP2PModel Tests", function () {
     evOtp2p.delete(0, 1);
 
   });
+
+  it("does apply remote ops on frontier", function () {
+    var evOtp2p = new OTP2PModel();
+    evOtp2p.insert(0, "abc");
+
+    evOtp2p.on("broadcast", (data) => {
+      // wait for the insert to be applied
+      setTimeout(() => {
+        // do a delete
+        remoteOp(data.revision, [2, {"d": 1}]);
+        assert.equal(prefilledModel.get(), "ab");
+        done();
+      })
+    });
+  });
+
+  it("does apply remote ops retroactively", function () {
+    var evOtp2p = new OTP2PModel();
+    let revision;
+    evOtp2p.insert(0, "abc");
+    evOtp2p.insert(3, "hij");
+
+    evOtp2p.on("broadcast", (data) => {
+      if (!revision) {
+        revision = data.revision;
+      } else {
+        // wait for the 2nd insert to be applied
+        setTimeout(() => {
+          // do a delete
+          remoteOp(data.revision, [3, {"i": "def"}]);
+          assert.equal(prefilledModel.get(), "abcdefhij");
+          done();
+        })
+      }
+    });
+  });
+
+  it("does apply remote mixed ops retroactively", function () {
+    var evOtp2p = new OTP2PModel();
+    let revision;
+    evOtp2p.insert(0, "abc");
+    evOtp2p.delete(0, 3);
+
+    evOtp2p.on("broadcast", (data) => {
+      if (!revision) {
+        revision = data.revision;
+      } else {
+        // wait for the 2nd insert to be applied
+        setTimeout(() => {
+          // do a delete
+          remoteOp(data.revision, [3, {"i": "def"}]);
+          assert.equal(prefilledModel.get(), "def");
+          done();
+        })
+      }
+    });
+  });
+
 });
