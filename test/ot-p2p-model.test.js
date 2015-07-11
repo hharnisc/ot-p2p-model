@@ -39,7 +39,7 @@ describe("OTP2PModel Tests", function () {
     var evOtp2p = new OTP2PModel();
 
     evOtp2p.on("broadcast", (data) => {
-      assert.notEqual(data.revision, undefined);
+      assert.equal(data.revision, null);
       assert.deepEqual(data.op, [{i: "c"}]);
       done();
     });
@@ -52,7 +52,7 @@ describe("OTP2PModel Tests", function () {
     evOtp2p.insert(0, "c");
 
     evOtp2p.on("broadcast", (data) => {
-      assert.notEqual(data.revision, undefined);
+      assert.notEqual(data.revision, null);
       assert.deepEqual(data.op, [{d: 1}]);
       done();
     });
@@ -61,64 +61,25 @@ describe("OTP2PModel Tests", function () {
 
   });
 
-  it("does apply remote ops on frontier", function (done) {
-    var evOtp2p = new OTP2PModel();
-
-    evOtp2p.on("broadcast", (data) => {
-      // wait for the insert to be applied
-      setTimeout(() => {
-        // do a delete
-        evOtp2p.remoteOp(data.revision, [2, {"d": 1}]);
-        assert.equal(evOtp2p.get(), "ab");
-        done();
-      })
-    });
-
-    evOtp2p.insert(0, "abc");
+  it("does apply remote ops on frontier", function () {
+    model.insert(0, "abc");
+    model.remoteOp(model.getLastOp(), [2, {"d": 1}])
+    assert.equal(model.get(), "ab");
   });
 
-  it("does apply remote ops retroactively", function (done) {
-    var evOtp2p = new OTP2PModel();
-    let revision;
+  it("does apply remote ops retroactively", function () {
+    model.insert(0, "abc");
+    model.insert(3, "hij");
 
-    evOtp2p.on("broadcast", (data) => {
-      if (!revision) {
-        revision = data.revision;
-      } else {
-        // wait for the 2nd insert to be applied
-        setTimeout(() => {
-          // do a delete
-          evOtp2p.remoteOp(revision, [3, {"i": "def"}]);
-          assert.equal(evOtp2p.get(), "abcdefhij");
-          done();
-        })
-      }
-    });
-
-    evOtp2p.insert(0, "abc");
-    evOtp2p.insert(3, "hij");
+    model.remoteOp(model.getFirstOp(), [3, {"i": "def"}]);
+    assert.equal(model.get(), "abcdefhij");
   });
 
-  it("does apply remote mixed ops retroactively", function (done) {
-    var evOtp2p = new OTP2PModel();
-    let revision;
-
-    evOtp2p.on("broadcast", (data) => {
-      if (!revision) {
-        revision = data.revision;
-      } else {
-        // wait for the 2nd insert to be applied
-        setTimeout(() => {
-          // do a delete
-          evOtp2p.remoteOp(revision, [3, {"i": "def"}]);
-          assert.equal(evOtp2p.get(), "def");
-          done();
-        })
-      }
-    });
-
-    evOtp2p.insert(0, "abc");
-    evOtp2p.delete(0, 3);
+  it("does apply remote mixed ops retroactively", function () {
+    model.insert(0, "abc");
+    model.delete(0, 3);
+    model.remoteOp(model.getFirstOp(), [3, {"i": "def"}]);
+    assert.equal(model.get(), "def");
   });
 
   it("does apply remote op as first op", function () {

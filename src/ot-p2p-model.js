@@ -9,6 +9,7 @@ const snapshot = Symbol("snapshot");
 const getSnapshot = Symbol("getSnapshot");
 const submitOp = Symbol("submitOp");
 const wayback = Symbol("wayback");
+const broadcast = Symbol("broadcast");
 
 export class OTP2PModel extends EventEmitter {
 
@@ -26,11 +27,24 @@ export class OTP2PModel extends EventEmitter {
     return this[snapshot];
   }
 
+  getFirstOp() {
+    return this[wayback].tail();
+  }
+
+  getLastOp() {
+    return this[wayback].head();
+  }
+
   [submitOp](op, cb) {
     op = type.normalize(op);
     this[snapshot] = type.apply(this[snapshot], op);
     let revision = this[wayback].push(op);
     cb(op, revision);
+  }
+
+  [broadcast](op, revision) {
+    let parent = this[wayback].getRevision(revision).parent;
+    this.emit('broadcast', { op: op, revision: parent});
   }
 
   get() {
@@ -39,13 +53,13 @@ export class OTP2PModel extends EventEmitter {
 
   insert(index, text) {
     this[api].insert(index, text, (op, revision) => {
-      this.emit('broadcast', { op: op, revision: revision});
+      this[broadcast](op, revision);
     });
   }
 
   delete(index, numChars) {
     this[api].remove(index, numChars, (op, revision) => {
-      this.emit('broadcast', { op: op, revision: revision});
+      this[broadcast](op, revision);
     });
   }
 
