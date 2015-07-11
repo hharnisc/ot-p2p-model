@@ -27,14 +27,6 @@ export class OTP2PModel extends EventEmitter {
     return this[snapshot];
   }
 
-  getFirstOp() {
-    return this[wayback].tail();
-  }
-
-  getLastOp() {
-    return this[wayback].head();
-  }
-
   [submitOp](op, cb) {
     op = type.normalize(op);
     this[snapshot] = type.apply(this[snapshot], op);
@@ -73,5 +65,21 @@ export class OTP2PModel extends EventEmitter {
       });
       this[submitOp](type.transform(op, composedSequence, 'left'), () => {});
     }
+  }
+
+  getFirstOp() {
+    return this[wayback].tail();
+  }
+
+  getLastOp() {
+    return this[wayback].head();
+  }
+
+  importModel(model) {
+    this[snapshot] = type.deserialize(model);
+  }
+
+  exportModel() {
+    return type.serialize(this[snapshot]);
   }
 }

@@ -88,4 +88,15 @@ describe("OTP2PModel Tests", function () {
     assert.equal(model.get(), "def");
   });
 
+  it("does import model", function () {
+    model.importModel(["abc"]);
+    assert.equal(model.get(), "abc");
+  });
+
+  it("does export model", function () {
+    model.insert(0, 'ab');
+    model.insert(2, 'c');
+    assert.equal(model.exportModel(), 'abc');
+  });
+
 });
