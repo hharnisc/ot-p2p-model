@@ -13,7 +13,10 @@ class OTP2P extends EventEmitter {
   constructor(text="") {
     super();
     this[snapshot] = type.create(text);
-    this[api] = type.api(this[getSnapshot].bind(this), this[submitOp].bind(this));
+    this[api] = type.api(
+      this[getSnapshot].bind(this),
+      this[submitOp].bind(this)
+    );
   }
 
   [getSnapshot]() {
@@ -23,7 +26,7 @@ class OTP2P extends EventEmitter {
   [submitOp](op, cb) {
     op = type.normalize(op);
     this[snapshot] = type.apply(this[snapshot], op);
-    cb();
+    cb(op);
   }
 
   get() {
@@ -31,11 +34,15 @@ class OTP2P extends EventEmitter {
   }
 
   insert(index, text) {
-    this[api].insert(index, text, () => {});
+    this[api].insert(index, text, (op) => {
+      this.emit('broadcast', op);
+    });
   }
 
   delete(index, numChars) {
-    this[api].remove(index, numChars, () => {});
+    this[api].remove(index, numChars, (op) => {
+      this.emit('broadcast', op);
+    });
   }
 }
 

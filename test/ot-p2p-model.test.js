@@ -34,4 +34,28 @@ describe("OTP2PModel Tests", function () {
     prefilledModel.delete(0, 5);
     assert.equal(prefilledModel.get(), "");
   });
+
+  it("does emit broadcast event on insert", function (done) {
+    var evOtp2p = new OTP2PModel();
+
+    evOtp2p.on("broadcast", (op) => {
+      assert.deepEqual(op, [{i: "c"}]);
+      done();
+    });
+
+    evOtp2p.insert(0, "c");
+  });
+
+  it("does emit broadcast event on delete", function (done) {
+    var evOtp2p = new OTP2PModel();
+    evOtp2p.insert(0, "c");
+
+    evOtp2p.on("broadcast", (op) => {
+      assert.deepEqual(op, [{d: 1}]);
+      done();
+    });
+
+    evOtp2p.delete(0, 1);
+
+  });
 });
