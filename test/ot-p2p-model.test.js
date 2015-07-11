@@ -61,47 +61,47 @@ describe("OTP2PModel Tests", function () {
 
   });
 
-  it("does apply remote ops on frontier", function () {
+  it("does apply remote ops on frontier", function (done) {
     var evOtp2p = new OTP2PModel();
-    evOtp2p.insert(0, "abc");
 
     evOtp2p.on("broadcast", (data) => {
       // wait for the insert to be applied
       setTimeout(() => {
         // do a delete
-        remoteOp(data.revision, [2, {"d": 1}]);
-        assert.equal(prefilledModel.get(), "ab");
+        evOtp2p.remoteOp(data.revision, [2, {"d": 1}]);
+        assert.equal(evOtp2p.get(), "ab");
         done();
       })
     });
+
+    evOtp2p.insert(0, "abc");
   });
 
-  it("does apply remote ops retroactively", function () {
+  it("does apply remote ops retroactively", function (done) {
     var evOtp2p = new OTP2PModel();
     let revision;
+
+    evOtp2p.on("broadcast", (data) => {
+      if (!revision) {
+        revision = data.revision;
+      } else {
+        // wait for the 2nd insert to be applied
+        setTimeout(() => {
+          // do a delete
+          evOtp2p.remoteOp(revision, [3, {"i": "def"}]);
+          assert.equal(evOtp2p.get(), "abcdefhij");
+          done();
+        })
+      }
+    });
+
     evOtp2p.insert(0, "abc");
     evOtp2p.insert(3, "hij");
-
-    evOtp2p.on("broadcast", (data) => {
-      if (!revision) {
-        revision = data.revision;
-      } else {
-        // wait for the 2nd insert to be applied
-        setTimeout(() => {
-          // do a delete
-          remoteOp(data.revision, [3, {"i": "def"}]);
-          assert.equal(prefilledModel.get(), "abcdefhij");
-          done();
-        })
-      }
-    });
   });
 
-  it("does apply remote mixed ops retroactively", function () {
+  it("does apply remote mixed ops retroactively", function (done) {
     var evOtp2p = new OTP2PModel();
     let revision;
-    evOtp2p.insert(0, "abc");
-    evOtp2p.delete(0, 3);
 
     evOtp2p.on("broadcast", (data) => {
       if (!revision) {
@@ -110,12 +110,21 @@ describe("OTP2PModel Tests", function () {
         // wait for the 2nd insert to be applied
         setTimeout(() => {
           // do a delete
-          remoteOp(data.revision, [3, {"i": "def"}]);
-          assert.equal(prefilledModel.get(), "def");
+          evOtp2p.remoteOp(revision, [3, {"i": "def"}]);
+          assert.equal(evOtp2p.get(), "def");
           done();
         })
       }
     });
+
+    evOtp2p.insert(0, "abc");
+    evOtp2p.delete(0, 3);
+  });
+
+  it("does apply remote op as first op", function () {
+    // do a delete
+    model.remoteOp(null, [{"i": "def"}]);
+    assert.equal(model.get(), "def");
   });
 
 });
