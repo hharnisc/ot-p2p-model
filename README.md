@@ -18,6 +18,7 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 **Latest Version** 0.0.5
 
 - uses revisions to retroactively apply remote operations using [wayback](https://github.com/hharnisc/wayback)
+- import and export text model and history
 
 **Version** 0.0.4
 
