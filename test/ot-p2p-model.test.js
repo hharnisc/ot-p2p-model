@@ -99,4 +99,33 @@ describe("OTP2PModel Tests", function () {
     assert.equal(model.exportModel(), 'abc');
   });
 
+  it("does export history", function() {
+    model.insert(0, 'ab');
+    assert.deepEqual(model.exportHistory(), {
+      model: {
+        faf6f19d3718f28e6800ed5ba8b92902eb037a7e: {
+          data: [{"i": "ab"}], parent: null, child: null }
+      },
+      length: 1,
+      head: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e",
+      tail: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e"
+    });
+  });
+
+  it("does import history", function () {
+    let history = {
+      model: {
+        faf6f19d3718f28e6800ed5ba8b92902eb037a7e: {
+          data: [{"i": "ab"}], parent: null, child: null }
+      },
+      length: 1,
+      head: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e",
+      tail: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e"
+    };
+    model.importHistory(history);
+    assert.equal(model.getFirstOp(), "faf6f19d3718f28e6800ed5ba8b92902eb037a7e");
+    assert.equal(model.getLastOp(), "faf6f19d3718f28e6800ed5ba8b92902eb037a7e");
+    assert.deepEqual(model.exportHistory(), history);
+  });
+
 });

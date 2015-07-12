@@ -82,4 +82,13 @@ export class OTP2PModel extends EventEmitter {
   exportModel() {
     return type.serialize(this[snapshot]);
   }
+
+  importHistory(history) {
+    this[wayback].importModel(history);
+  }
+
+  exportHistory() {
+    return this[wayback].exportModel();
+  }
+
 }
