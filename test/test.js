@@ -104,7 +104,9 @@ describe("OTP2PModel Tests", function () {
       },
       length: 1,
       head: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e",
-      tail: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e"
+      tail: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e",
+      "pseudonymMap": {},
+      "pseudonyms": {}
     });
   });
 
@@ -116,7 +118,9 @@ describe("OTP2PModel Tests", function () {
       },
       length: 1,
       head: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e",
-      tail: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e"
+      tail: "faf6f19d3718f28e6800ed5ba8b92902eb037a7e",
+      "pseudonymMap": {},
+      "pseudonyms": {}
     };
     model.importHistory(history);
     assert.equal(model.getFirstOp(), "faf6f19d3718f28e6800ed5ba8b92902eb037a7e");

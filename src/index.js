@@ -13,10 +13,10 @@ const broadcast = Symbol("broadcast");
 
 export class OTP2PModel extends EventEmitter {
 
-  constructor(text="") {
+  constructor(text="", maxHistory=100) {
     super();
     this[snapshot] = type.create(text);
-    this[wayback] = new Wayback();
+    this[wayback] = new Wayback(maxHistory);
     this[api] = type.api(
       this[getSnapshot].bind(this),
       this[submitOp].bind(this)
