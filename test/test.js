@@ -1,9 +1,5 @@
-/*global describe*/
-/*global beforeEach*/
-/*global it*/
-
 let assert = require("assert");
-import { OTP2PModel } from "../src/ot-p2p-model";
+import { OTP2PModel } from "../src/index";
 
 describe("OTP2PModel Tests", function () {
   let model;
@@ -63,7 +59,7 @@ describe("OTP2PModel Tests", function () {
 
   it("does apply remote ops on frontier", function () {
     model.insert(0, "abc");
-    model.remoteOp(model.getLastOp(), [2, {"d": 1}])
+    model.remoteOp(model.getLastOp(), [2, {"d": 1}]);
     assert.equal(model.get(), "ab");
   });
 
