@@ -15,7 +15,11 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 ## History
 
-**Latest Version** 0.0.5
+**Latest Version** 0.0.6
+- use a newer version of [wayback](https://github.com/hharnisc/wayback) to identify revisions
+- emit `resync` event when remoteOp fails
+
+**Version** 0.0.5
 
 - uses revisions to retroactively apply remote operations using [wayback](https://github.com/hharnisc/wayback)
 - import and export text model and history
@@ -58,6 +62,10 @@ otp2pModel.on('insert', (command) => {
 
 otp2pModel.on('broadcast', (command) => {
   console.log(command); // log the broadcast details
+});
+
+otp2pModel.on('resync', () => {
+  // couldn't apply a remote op, time to resync
 });
 
 // single character operations
@@ -124,3 +132,7 @@ Emitted whenever local or remote delete commands are detected. If the command is
 #### broadcast
 
 Emitted whenever local insert or delete commands have been applied, returns a revision and the op applied
+
+#### resync
+
+Emitted whenever a remote operation fails.
