@@ -123,9 +123,22 @@ describe("OTP2PModel Tests", function () {
       "pseudonyms": {}
     };
     model.importHistory(history);
-    assert.equal(model.getFirstOp(), "faf6f19d3718f28e6800ed5ba8b92902eb037a7e");
-    assert.equal(model.getLastOp(), "faf6f19d3718f28e6800ed5ba8b92902eb037a7e");
+    assert.equal(
+      model.getFirstOp(),
+      "faf6f19d3718f28e6800ed5ba8b92902eb037a7e"
+    );
+    assert.equal(
+      model.getLastOp(),
+      "faf6f19d3718f28e6800ed5ba8b92902eb037a7e"
+    );
     assert.deepEqual(model.exportHistory(), history);
   });
 
+  it("does emit resync event when unknown remote op is found", function (done) {
+    var evOtp2p = new OTP2PModel();
+
+    evOtp2p.on("resync", () => done());
+
+    evOtp2p.remoteOp("youdontknowme", [{'i': "hi"}]);
+  });
 });

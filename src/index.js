@@ -60,10 +60,14 @@ export class OTP2PModel extends EventEmitter {
       this[submitOp](op, () => {});
     } else {
       let sequence = this[wayback].getSequence(parent);
-      let composedSequence = sequence.reduce((p, c) => {
-        return type.compose(p, c);
-      });
-      this[submitOp](type.transform(op, composedSequence, 'left'), () => {});
+      if (sequence === null) {
+        this.emit('resync');
+      } else {
+        let composedSequence = sequence.reduce((p, c) => {
+          return type.compose(p, c);
+        });
+        this[submitOp](type.transform(op, composedSequence, 'left'), () => {});
+      }
     }
   }
 
