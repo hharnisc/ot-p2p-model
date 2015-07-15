@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.org/hharnisc/ot-p2p-model.svg?branch=master)](https://travis-ci.org/hharnisc/ot-p2p-model)
 
-Maintain local and remote models for P2P based OT system
+Maintain local models for P2P based OT system
 
-Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/oster06collcom.pdf).
+*NOTE: this is still highly experimental and not in any way ready for production.*
+
+The goal is to have a working implementation of [lightwave](https://code.google.com/p/lightwave/source/browse/trunk/experimental/ot/README)
 
 **Table of Contents**
 
@@ -15,7 +17,11 @@ Implements the following [white paper](http://www.loria.fr/~urso/uploads/Main/os
 
 ## History
 
-**Latest Version** 0.0.6
+**Latest Version** 0.0.7
+
+- update to version of [wayback](https://github.com/hharnisc/wayback) that uses UUID to create revisions
+
+**Version** 0.0.6
 - use a newer version of [wayback](https://github.com/hharnisc/wayback) to identify revisions
 - emit `resync` event when remoteOp fails
 
